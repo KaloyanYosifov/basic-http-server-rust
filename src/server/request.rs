@@ -1,9 +1,11 @@
 use std::convert::TryFrom;
-use std::str::Utf8Error;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use super::Method;
+use std::str::Utf8Error;
+
 use crate::server::Method::GET;
+
+use super::Method;
 
 #[derive(Debug)]
 pub enum RequestError {
@@ -65,7 +67,9 @@ impl TryFrom<&[u8]> for Request {
 #[cfg(test)]
 mod tests {
     use std::convert::TryInto;
-    use crate::server::request::Request;
+    use crate::server::Method::{GET, POST};
+
+    use crate::server::request::{Request, RequestError};
 
     #[test]
     fn it_can_create_a_request_from_buffer() {
@@ -74,6 +78,27 @@ mod tests {
 
         assert_eq!("/", request.route);
         assert_eq!("HTTP/1.1", request.protocol);
-        matches!(request.method, super::super::Method::GET);
+        assert!(matches!(request.method, GET));
+    }
+
+    #[test]
+    fn it_can_parse_other_request_methods() {
+        let buffer = "POST / HTTP/1.1".as_bytes();
+        let request: Request = buffer.try_into().unwrap();
+
+        assert_eq!("/", request.route);
+        assert_eq!("HTTP/1.1", request.protocol);
+        assert!(matches!(request.method, POST));
+    }
+
+    #[test]
+    fn it_returns_an_error_if_it_cannot_be_encoded() {
+        let buffer: &[u8] = &[255; 3][..];
+        let request: Result<Request, RequestError> = buffer.try_into();
+
+        match request {
+            Ok(_) => panic!("This should have failed!"),
+            _ => assert!(true)
+        }
     }
 }

@@ -1,14 +1,22 @@
 use std::net::TcpListener;
 use std::io::Read;
+use std::fmt::{Display, Formatter};
 
 mod request;
 
+#[derive(Debug)]
 pub enum Method {
     GET,
     POST,
     OPTIONS,
     PUT,
     PATCH,
+}
+
+impl Display for Method {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 pub struct Server {
