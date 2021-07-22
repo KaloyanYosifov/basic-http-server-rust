@@ -1,6 +1,16 @@
 use std::net::TcpListener;
 use std::io::Read;
 
+mod request;
+
+pub enum Method {
+    GET,
+    POST,
+    OPTIONS,
+    PUT,
+    PATCH,
+}
+
 pub struct Server {
     address: String,
 }
