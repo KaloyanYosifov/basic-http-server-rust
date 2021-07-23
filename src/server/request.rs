@@ -4,8 +4,9 @@ use std::fmt::{Display, Formatter};
 use std::str::{Utf8Error, FromStr};
 
 use super::Method;
-use crate::server::request::RequestError::{FailedToParse, InvalidMethod};
+use crate::server::request::RequestError::{FailedToParse, InvalidMethod, InvalidProtocol};
 use crate::server::MethodParseError;
+use regex::Regex;
 
 #[derive(Debug)]
 pub enum RequestError {
@@ -72,6 +73,11 @@ impl TryFrom<&[u8]> for Request {
         let method = contents.get(0).unwrap().parse()?;
         let route = contents.get(1).unwrap().to_string();
         let protocol = contents.get(2).unwrap().to_string();
+        let protocol_regex = Regex::new(r"HTTP/(1\.1|2\.0)").unwrap();
+
+        if !protocol_regex.is_match(&protocol) {
+            return Err(InvalidProtocol(protocol));
+        }
 
         let request = Request::new(
             method,
@@ -111,6 +117,16 @@ mod tests {
     }
 
     #[test]
+    fn it_supports_http_2() {
+        let buffer = "POST / HTTP/2.0\nsomeHeader".as_bytes();
+        let request: Request = buffer.try_into().unwrap();
+
+        assert_eq!("/", request.route);
+        assert_eq!("HTTP/2.0", request.protocol);
+        assert!(matches!(request.method, POST));
+    }
+
+    #[test]
     fn it_throws_an_error_if_the_parsed_contents_are_not_splitted_into_at_least_three_chunks() {
         let buffer = "GET /".as_bytes();
         let request: Result<Request, RequestError> = buffer.try_into();
@@ -145,6 +161,22 @@ mod tests {
         match request {
             Ok(_) => panic!("This should have failed!"),
             Err(error) => assert!(matches!(error, RequestError::InvalidEncoding))
+        }
+    }
+
+    #[test]
+    fn it_throws_an_error_if_the_protocol_is_not_supported() {
+        let buffer = "POST / HTTP/3.0\nsomeHeader".as_bytes();
+        let request: Result<Request, RequestError> = buffer.try_into();
+
+        match request {
+            Ok(_) => panic!("This should have failed!"),
+            Err(error) => {
+                match error {
+                    RequestError::InvalidProtocol(protocol) => assert_eq!("HTTP/3.0", protocol),
+                    _ => panic!("This should have failed!")
+                }
+            }
         }
     }
 }
