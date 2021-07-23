@@ -6,6 +6,8 @@ use std::str::Utf8Error;
 use crate::server::Method::GET;
 
 use super::Method;
+use crate::server::request::RequestError::FailedToParse;
+use crate::server::MethodParseError;
 
 #[derive(Debug)]
 pub enum RequestError {
@@ -27,6 +29,10 @@ impl From<Utf8Error> for RequestError {
     fn from(_: Utf8Error) -> Self {
         RequestError::InvalidEncoding
     }
+}
+
+impl From<MethodParseError> for RequestError {
+    fn from(_: MethodParseError) -> Self { RequestError::FailedToParse }
 }
 
 pub struct Request {
@@ -53,11 +59,22 @@ impl TryFrom<&[u8]> for Request {
     type Error = RequestError;
 
     fn try_from(buffer: &[u8]) -> Result<Self, Self::Error> {
-        let contents = std::str::from_utf8(&buffer)?;
+        let contents: Vec<&str> = std::str::from_utf8(&buffer)?.split(&[' ', '\n'][..]).collect();
+
+        // if the length is less than 3
+        // we are going to return an error
+        if contents.len() < 3 {
+            return Err(FailedToParse);
+        }
+
+        let method = Method::try_from(*contents.get(0).unwrap())?;
+        let route = contents.get(1).unwrap().to_string();
+        let protocol = contents.get(2).unwrap().to_string();
+
         let request = Request::new(
-            Method::GET,
-            "HTTP/1.1".to_string(),
-            "/".to_string(),
+            method,
+            protocol,
+            route,
         );
 
         Ok(request)
@@ -73,7 +90,7 @@ mod tests {
 
     #[test]
     fn it_can_create_a_request_from_buffer() {
-        let buffer = "GET / HTTP/1.1".as_bytes();
+        let buffer = "GET / HTTP/1.1\n".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
         assert_eq!("/", request.route);
@@ -83,7 +100,7 @@ mod tests {
 
     #[test]
     fn it_can_parse_other_request_methods() {
-        let buffer = "POST / HTTP/1.1".as_bytes();
+        let buffer = "POST / HTTP/1.1\nsomeHeader".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
         assert_eq!("/", request.route);
