@@ -3,8 +3,6 @@ use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::str::Utf8Error;
 
-use crate::server::Method::GET;
-
 use super::Method;
 use crate::server::request::RequestError::FailedToParse;
 use crate::server::MethodParseError;
