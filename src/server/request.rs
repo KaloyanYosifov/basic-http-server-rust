@@ -107,13 +107,24 @@ mod tests {
     }
 
     #[test]
+    fn it_throws_an_error_if_the_parsed_contents_are_not_splitted_into_at_least_three_chunks() {
+        let buffer = "GET /".as_bytes();
+        let request: Result<Request, RequestError> = buffer.try_into();
+
+        match request {
+            Ok(_) => panic!("This should have failed!"),
+            Err(error) => assert!(matches!(error, RequestError::FailedToParse))
+        }
+    }
+
+    #[test]
     fn it_returns_an_error_if_it_cannot_be_encoded() {
         let buffer: &[u8] = &[255; 3][..];
         let request: Result<Request, RequestError> = buffer.try_into();
 
         match request {
             Ok(_) => panic!("This should have failed!"),
-            _ => assert!(true)
+            Err(error) => assert!(matches!(error, RequestError::InvalidEncoding))
         }
     }
 }
