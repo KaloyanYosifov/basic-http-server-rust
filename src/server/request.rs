@@ -4,7 +4,7 @@ use std::fmt::{Display, Formatter};
 use std::str::Utf8Error;
 
 use super::Method;
-use crate::server::request::RequestError::FailedToParse;
+use crate::server::request::RequestError::{FailedToParse, InvalidMethod};
 use crate::server::MethodParseError;
 
 #[derive(Debug)]
@@ -30,7 +30,11 @@ impl From<Utf8Error> for RequestError {
 }
 
 impl From<MethodParseError> for RequestError {
-    fn from(_: MethodParseError) -> Self { RequestError::FailedToParse }
+    fn from(error: MethodParseError) -> Self {
+        match error {
+            MethodParseError::InvalidMethod(value) => InvalidMethod(value)
+        }
+    }
 }
 
 pub struct Request {
@@ -114,6 +118,22 @@ mod tests {
         match request {
             Ok(_) => panic!("This should have failed!"),
             Err(error) => assert!(matches!(error, RequestError::FailedToParse))
+        }
+    }
+
+    #[test]
+    fn it_throws_an_error_if_we_pass_an_invalid_http_request_method() {
+        let buffer = "FAST / HTTP/1.1\nsomeHeader".as_bytes();
+        let request: Result<Request, RequestError> = buffer.try_into();
+
+        match request {
+            Ok(_) => panic!("This should have failed!"),
+            Err(error) => {
+                match error {
+                    RequestError::InvalidMethod(method) => assert_eq!("FAST", method.to_string()),
+                    _ => panic!("This should have failed!")
+                }
+            }
         }
     }
 

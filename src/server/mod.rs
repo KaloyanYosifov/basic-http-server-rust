@@ -8,7 +8,7 @@ mod request;
 
 #[derive(Debug)]
 pub enum MethodParseError {
-    InvalidMethod
+    InvalidMethod(String)
 }
 
 #[derive(Debug)]
@@ -36,7 +36,7 @@ impl TryFrom<&str> for Method {
             "PUT" => Ok(Self::PUT),
             "PATCH" => Ok(Self::PATCH),
             "OPTIONS" => Ok(Self::OPTIONS),
-            _ => Err(InvalidMethod)
+            _ => Err(InvalidMethod(value.to_string()))
         }
     }
 }
