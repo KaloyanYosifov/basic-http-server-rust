@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use std::str::Utf8Error;
+use std::str::{Utf8Error, FromStr};
 
 use super::Method;
 use crate::server::request::RequestError::{FailedToParse, InvalidMethod};
@@ -69,7 +69,7 @@ impl TryFrom<&[u8]> for Request {
             return Err(FailedToParse);
         }
 
-        let method = Method::try_from(*contents.get(0).unwrap())?;
+        let method = contents.get(0).unwrap().parse()?;
         let route = contents.get(1).unwrap().to_string();
         let protocol = contents.get(2).unwrap().to_string();
 

@@ -3,6 +3,7 @@ use std::io::Read;
 use std::fmt::{Display, Formatter};
 use std::convert::TryFrom;
 use crate::server::MethodParseError::InvalidMethod;
+use std::str::FromStr;
 
 mod request;
 
@@ -26,10 +27,10 @@ impl Display for Method {
     }
 }
 
-impl TryFrom<&str> for Method {
-    type Error = MethodParseError;
+impl FromStr for Method {
+    type Err = MethodParseError;
 
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
             "GET" => Ok(Self::GET),
             "POST" => Ok(Self::POST),
