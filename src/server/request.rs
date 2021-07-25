@@ -7,12 +7,13 @@ use super::Method;
 use crate::server::request::RequestError::{FailedToParse, InvalidMethod, InvalidProtocol};
 use crate::server::MethodParseError;
 use regex::Regex;
-use crate::server::route::Route;
+use crate::server::route::{Route, RouteError};
 
 #[derive(Debug)]
 pub enum RequestError {
     FailedToParse,
     InvalidEncoding,
+    InvalidPath(String),
     InvalidMethod(String),
     InvalidProtocol(String),
 }
@@ -24,6 +25,12 @@ impl Display for RequestError {
 }
 
 impl Error for RequestError {}
+
+impl From<RouteError> for RequestError {
+    fn from(_: RouteError) -> Self {
+        RequestError::FailedToParse
+    }
+}
 
 impl From<Utf8Error> for RequestError {
     fn from(_: Utf8Error) -> Self {
@@ -72,7 +79,7 @@ impl TryFrom<&[u8]> for Request {
         }
 
         let method = contents.get(0).unwrap().parse()?;
-        let route = Route::new(contents.get(1).unwrap().to_string());
+        let route = Route::new(contents.get(1).unwrap().to_string())?;
         let protocol = contents.get(2).unwrap().to_string();
         let protocol_regex = Regex::new(r"HTTP/(1\.1|2\.0)").unwrap();
 
