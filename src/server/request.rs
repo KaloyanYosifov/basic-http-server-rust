@@ -7,6 +7,7 @@ use super::Method;
 use crate::server::request::RequestError::{FailedToParse, InvalidMethod, InvalidProtocol};
 use crate::server::MethodParseError;
 use regex::Regex;
+use crate::server::route::Route;
 
 #[derive(Debug)]
 pub enum RequestError {
@@ -39,7 +40,7 @@ impl From<MethodParseError> for RequestError {
 }
 
 pub struct Request {
-    route: String,
+    route: Route,
     protocol: String,
     method: Method,
 }
@@ -48,7 +49,7 @@ impl Request {
     pub fn new(
         method: Method,
         protocol: String,
-        route: String,
+        route: Route,
     ) -> Self {
         Request {
             route,
@@ -71,7 +72,7 @@ impl TryFrom<&[u8]> for Request {
         }
 
         let method = contents.get(0).unwrap().parse()?;
-        let route = contents.get(1).unwrap().to_string();
+        let route = Route::new(contents.get(1).unwrap().to_string());
         let protocol = contents.get(2).unwrap().to_string();
         let protocol_regex = Regex::new(r"HTTP/(1\.1|2\.0)").unwrap();
 
@@ -101,7 +102,7 @@ mod tests {
         let buffer = "GET / HTTP/1.1\n".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
-        assert_eq!("/", request.route);
+        assert_eq!("/", request.route.get_path());
         assert_eq!("HTTP/1.1", request.protocol);
         assert!(matches!(request.method, GET));
     }
@@ -111,7 +112,7 @@ mod tests {
         let buffer = "POST / HTTP/1.1\nsomeHeader".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
-        assert_eq!("/", request.route);
+        assert_eq!("/", request.route.get_path());
         assert_eq!("HTTP/1.1", request.protocol);
         assert!(matches!(request.method, POST));
     }
@@ -121,7 +122,7 @@ mod tests {
         let buffer = "POST / HTTP/2.0\nsomeHeader".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
-        assert_eq!("/", request.route);
+        assert_eq!("/", request.route.get_path());
         assert_eq!("HTTP/2.0", request.protocol);
         assert!(matches!(request.method, POST));
     }
