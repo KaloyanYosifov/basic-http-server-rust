@@ -45,7 +45,12 @@ mod tests {
     #[test]
     fn it_throws_an_error_if_the_path_doesnt_start_with_a_slash() {
         match Route::new("gangsta".to_string()) {
-            Err(error) => assert!(matches!(RouteError::InvalidPath("gangsta".to_string()), error)),
+            Err(error) => {
+                match error {
+                    RouteError::InvalidPath(path) => assert_eq!("gangsta", path),
+                    _ => panic!("This should have failed!")
+                }
+            }
             _ => panic!("This should have failed!")
         }
     }

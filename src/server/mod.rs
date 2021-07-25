@@ -1,7 +1,6 @@
 use std::net::TcpListener;
 use std::io::Read;
 use std::fmt::{Display, Formatter};
-use std::convert::TryFrom;
 use crate::server::MethodParseError::InvalidMethod;
 use std::str::FromStr;
 

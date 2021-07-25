@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use std::str::{Utf8Error, FromStr};
+use std::str::{Utf8Error};
 
 use super::Method;
 use crate::server::request::RequestError::{FailedToParse, InvalidMethod, InvalidProtocol};
