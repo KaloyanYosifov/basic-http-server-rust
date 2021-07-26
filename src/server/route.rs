@@ -1,23 +1,13 @@
 use regex::Regex;
+use crate::server::query_params::QueryParams;
 
 pub enum RouteError {
     InvalidPath(String)
 }
 
-pub struct QueryParams {
-    query: String,
-}
-
-impl QueryParams {
-    fn new(query: String) -> Self {
-        Self {
-            query
-        }
-    }
-}
-
 pub struct Route {
     path: String,
+    query_params: QueryParams,
 }
 
 impl Route {
@@ -26,9 +16,12 @@ impl Route {
             return Err(RouteError::InvalidPath(path));
         }
 
+        let query_params = QueryParams::new(path.clone());
+
         Ok(
             Self {
-                path
+                path,
+                query_params,
             }
         )
     }

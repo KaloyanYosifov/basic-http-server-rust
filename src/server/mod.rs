@@ -5,6 +5,7 @@ use crate::server::MethodParseError::InvalidMethod;
 use std::str::FromStr;
 
 mod route;
+mod query_params;
 mod request;
 
 #[derive(Debug)]
