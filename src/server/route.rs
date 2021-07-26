@@ -1,5 +1,19 @@
+use regex::Regex;
+
 pub enum RouteError {
     InvalidPath(String)
+}
+
+pub struct QueryParams {
+    query: String,
+}
+
+impl QueryParams {
+    fn new(query: String) -> Self {
+        Self {
+            query
+        }
+    }
 }
 
 pub struct Route {
@@ -20,7 +34,9 @@ impl Route {
     }
 
     fn is_path_valid(path: &str) -> bool {
-        path.starts_with('/')
+        let compiled_regex = Regex::new(r"^/([^/\s]+/?)?(.*)$").unwrap();
+
+        compiled_regex.is_match(&path)
     }
 }
 
