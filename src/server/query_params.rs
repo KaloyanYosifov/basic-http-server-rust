@@ -43,13 +43,15 @@ impl<'buf> QueryParams<'buf> {
 }
 
 impl<'buf> QueryParams<'buf> {
-    fn get_param(&self, key: &str) -> Option<&&str> {
+    pub fn get_param(&self, key: &str) -> Option<&&str> {
         self.params.get(key)
     }
-    fn is_empty(&self) -> bool {
+
+    pub fn is_empty(&self) -> bool {
         self.params.is_empty()
     }
-    fn is_not_empty(&self) -> bool {
+
+    pub fn is_not_empty(&self) -> bool {
         !self.is_empty()
     }
 }

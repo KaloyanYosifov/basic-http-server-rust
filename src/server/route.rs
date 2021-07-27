@@ -1,6 +1,7 @@
 use regex::Regex;
 use crate::server::query_params::QueryParams;
 
+#[derive(Debug)]
 pub enum RouteError {
     InvalidPath(String)
 }
@@ -37,6 +38,10 @@ impl<'buf> Route<'buf> {
     pub fn get_path(&self) -> &str {
         &self.path
     }
+
+    pub fn get_param(&self, key: &str) -> Option<&&str> {
+        self.query_params.get_param(key)
+    }
 }
 
 #[cfg(test)]
@@ -49,6 +54,14 @@ mod tests {
         let route = Route::new("/");
 
         assert!(true);
+    }
+
+    #[test]
+    fn it_has_query_params() {
+        let route = Route::new("/?hello=test&working=true").unwrap();
+
+        assert_eq!("test", *route.get_param("hello").unwrap());
+        assert_eq!("true", *route.get_param("working").unwrap());
     }
 
     #[test]
