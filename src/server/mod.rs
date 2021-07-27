@@ -60,7 +60,7 @@ impl Server {
         let listener = TcpListener::bind(&self.address)?;
 
         for stream in listener.incoming() {
-            let mut input = [0; 20];
+            let mut input = [0; 4096];
 
             stream?.read(&mut input)?;
 
