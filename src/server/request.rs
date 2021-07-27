@@ -46,6 +46,7 @@ impl From<MethodParseError> for RequestError {
     }
 }
 
+#[derive(Debug)]
 pub struct Request<'buf> {
     route: Route<'buf>,
     protocol: &'buf str,
@@ -81,7 +82,7 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
         let method = contents.get(0).unwrap().parse()?;
         let route = Route::new(contents.get(1).unwrap())?;
         let protocol = contents.get(2).unwrap();
-        let protocol_regex = Regex::new(r"HTTP/(1\.1|2\.0)").unwrap();
+        let protocol_regex = Regex::new(r"HTTP/(1(\.1)?|2\.0)").unwrap();
 
         if !protocol_regex.is_match(protocol) {
             return Err(InvalidProtocol(protocol.to_string()));

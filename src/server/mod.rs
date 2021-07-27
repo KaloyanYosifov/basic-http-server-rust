@@ -3,6 +3,8 @@ use std::io::Read;
 use std::fmt::{Display, Formatter};
 use crate::server::MethodParseError::InvalidMethod;
 use std::str::FromStr;
+use crate::server::request::{Request, RequestError};
+use std::convert::TryInto;
 
 mod route;
 mod query_params;
@@ -62,7 +64,14 @@ impl Server {
 
             stream?.read(&mut input)?;
 
-            print!("{}", std::str::from_utf8(&input).unwrap())
+            let request_resolver: Result<Request, RequestError> = input[..].try_into();
+
+            match request_resolver {
+                Ok(request) => {
+                    println!("{:?}", request)
+                }
+                _ => panic!("Something went wrong! {:?}", std::str::from_utf8(&input).unwrap())
+            }
         }
 
         Ok(())

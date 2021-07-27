@@ -6,6 +6,7 @@ pub enum RouteError {
     InvalidPath(String)
 }
 
+#[derive(Debug)]
 pub struct Route<'buf> {
     path: &'buf str,
     query_params: QueryParams<'buf>,
