@@ -1,5 +1,5 @@
 use std::net::TcpListener;
-use std::io::Read;
+use std::io::{Read, Write};
 use std::fmt::{Display, Formatter};
 use crate::server::MethodParseError::InvalidMethod;
 use std::str::FromStr;
@@ -61,14 +61,25 @@ impl Server {
 
         for stream in listener.incoming() {
             let mut input = [0; 4096];
+            let mut stream = stream?;
 
-            stream?.read(&mut input)?;
+            stream.read(&mut input)?;
 
             let request_resolver: Result<Request, RequestError> = input[..].try_into();
 
             match request_resolver {
                 Ok(request) => {
-                    println!("{:?}", request)
+                    println!("{:?}", request);
+
+                    let contents = "<html><body><h3>Hello World</h3></body></html>";
+                    let response = format!(
+                        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+                        contents.len(),
+                        contents
+                    );
+
+                    stream.write(response.as_bytes())?;
+                    stream.flush()?;
                 }
                 _ => panic!("Something went wrong! {:?}", std::str::from_utf8(&input).unwrap())
             }
