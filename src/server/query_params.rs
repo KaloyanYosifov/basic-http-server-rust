@@ -24,18 +24,20 @@ impl QueryParams {
         let query_slice = &path[query_string_delimiter_index..];
         let mut params: HashMap<String, String> = HashMap::new();
 
+        fn split_param(param: &str) -> (&str, &str) {
+            let splitted_param: Vec<&str> = param.split('=').collect();
+
+            (splitted_param[0], splitted_param[1])
+        }
+
         if query_slice.contains('&') {
             for param in query_slice.split('&') {
-                let splitted_param: Vec<&str> = param.split('=').collect();
-                let name = splitted_param[0];
-                let value = splitted_param[1];
+                let (name, value) = split_param(param);
 
                 params.insert(name.to_string(), value.to_string());
             }
         } else {
-            let splitted_param: Vec<&str> = query_slice.split('=').collect();
-            let name = splitted_param[0];
-            let value = splitted_param[1];
+            let (name, value) = split_param(query_slice);
 
             params.insert(name.to_string(), value.to_string());
         }
