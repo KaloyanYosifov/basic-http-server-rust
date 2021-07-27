@@ -5,18 +5,18 @@ pub enum RouteError {
     InvalidPath(String)
 }
 
-pub struct Route {
-    path: String,
-    query_params: QueryParams,
+pub struct Route<'buf> {
+    path: &'buf str,
+    query_params: QueryParams<'buf>,
 }
 
-impl Route {
-    pub fn new(path: String) -> Result<Self, RouteError> {
+impl<'buf> Route<'buf> {
+    pub fn new(path: &'buf str) -> Result<Self, RouteError> {
         if !Self::is_path_valid(&path) {
-            return Err(RouteError::InvalidPath(path));
+            return Err(RouteError::InvalidPath(path.to_string()));
         }
 
-        let query_params = QueryParams::new(path.clone());
+        let query_params = QueryParams::from_path(path);
 
         Ok(
             Self {
@@ -33,8 +33,8 @@ impl Route {
     }
 }
 
-impl Route {
-    pub fn get_path(&self) -> &String {
+impl<'buf> Route<'buf> {
+    pub fn get_path(&self) -> &str {
         &self.path
     }
 }
@@ -46,14 +46,14 @@ mod tests {
 
     #[test]
     fn it_can_be_created_with_a_path() {
-        let route = Route::new("/".to_string());
+        let route = Route::new("/");
 
         assert!(true);
     }
 
     #[test]
     fn it_throws_an_error_if_the_path_doesnt_start_with_a_slash() {
-        match Route::new("gangsta".to_string()) {
+        match Route::new("gangsta") {
             Err(error) => {
                 match error {
                     RouteError::InvalidPath(path) => assert_eq!("gangsta", path),

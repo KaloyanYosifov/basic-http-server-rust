@@ -46,17 +46,17 @@ impl From<MethodParseError> for RequestError {
     }
 }
 
-pub struct Request {
-    route: Route,
-    protocol: String,
+pub struct Request<'buf> {
+    route: Route<'buf>,
+    protocol: &'buf str,
     method: Method,
 }
 
-impl Request {
+impl<'buf> Request<'buf> {
     pub fn new(
         method: Method,
-        protocol: String,
-        route: Route,
+        protocol: &'buf str,
+        route: Route<'buf>,
     ) -> Self {
         Request {
             route,
@@ -66,10 +66,10 @@ impl Request {
     }
 }
 
-impl TryFrom<&[u8]> for Request {
+impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
     type Error = RequestError;
 
-    fn try_from(buffer: &[u8]) -> Result<Self, Self::Error> {
+    fn try_from(buffer: &'buf [u8]) -> Result<Self, Self::Error> {
         let contents: Vec<&str> = std::str::from_utf8(&buffer)?.split(&[' ', '\n'][..]).collect();
 
         // if the length is less than 3
@@ -79,12 +79,12 @@ impl TryFrom<&[u8]> for Request {
         }
 
         let method = contents.get(0).unwrap().parse()?;
-        let route = Route::new(contents.get(1).unwrap().to_string())?;
-        let protocol = contents.get(2).unwrap().to_string();
+        let route = Route::new(contents.get(1).unwrap())?;
+        let protocol = contents.get(2).unwrap();
         let protocol_regex = Regex::new(r"HTTP/(1\.1|2\.0)").unwrap();
 
-        if !protocol_regex.is_match(&protocol) {
-            return Err(InvalidProtocol(protocol));
+        if !protocol_regex.is_match(protocol) {
+            return Err(InvalidProtocol(protocol.to_string()));
         }
 
         let request = Request::new(
