@@ -32,6 +32,12 @@ impl QueryParams {
 
                 params.insert(name.to_string(), value.to_string());
             }
+        } else {
+            let splitted_param: Vec<&str> = query_slice.split('=').collect();
+            let name = splitted_param[0];
+            let value = splitted_param[1];
+
+            params.insert(name.to_string(), value.to_string());
         }
 
         Self {
@@ -43,6 +49,12 @@ impl QueryParams {
 impl QueryParams {
     fn get_param(&self, key: &str) -> Option<&String> {
         self.params.get(key)
+    }
+    fn is_empty(&self) -> bool {
+        self.params.is_empty()
+    }
+    fn is_not_empty(&self) -> bool {
+        !self.is_empty()
     }
 }
 
@@ -56,7 +68,27 @@ mod tests {
             "/?hello=test&working=true".to_string()
         );
 
+        assert!(query_params.is_not_empty());
         assert_eq!("test", query_params.get_param("hello").unwrap());
         assert_eq!("true", query_params.get_param("working").unwrap());
+    }
+
+    #[test]
+    fn it_has_no_params_if_there_is_no_query_string() {
+        let query_params = QueryParams::from_path(
+            "/".to_string()
+        );
+
+        assert!(query_params.is_empty());
+    }
+
+    #[test]
+    fn it_has_no_problem_to_parse_a_single_query_param() {
+        let query_params = QueryParams::from_path(
+            "/?hello=test".to_string()
+        );
+
+        assert!(query_params.is_not_empty());
+        assert_eq!("test", query_params.get_param("hello").unwrap());
     }
 }
