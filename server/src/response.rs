@@ -61,7 +61,7 @@ impl<'content> Response<'content> {
 
 #[cfg(test)]
 mod tests {
-    use crate::server::response::{Response, StatusCode};
+    use crate::response::{Response, StatusCode};
 
     #[test]
     fn it_returns_a_stringified_response() {

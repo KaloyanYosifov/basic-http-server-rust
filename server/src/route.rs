@@ -1,5 +1,5 @@
 use regex::Regex;
-use crate::server::query_params::QueryParams;
+use crate::query_params::QueryParams;
 
 #[derive(Debug)]
 pub enum RouteError {
@@ -47,8 +47,7 @@ impl<'buf> Route<'buf> {
 
 #[cfg(test)]
 mod tests {
-    use crate::server::route::Route;
-    use crate::server::route::RouteError;
+    use crate::route::{Route, RouteError};
 
     #[test]
     fn it_can_be_created_with_a_path() {

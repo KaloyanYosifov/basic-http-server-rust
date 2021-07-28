@@ -1,14 +1,13 @@
 use std::net::TcpListener;
 use std::io::{Read, Write};
 use std::fmt::{Display, Formatter};
-use crate::server::MethodParseError::InvalidMethod;
 use std::str::FromStr;
-use crate::server::request::{Request, RequestError};
 use std::convert::TryInto;
-use crate::server::response::{Response, StatusCode};
+use crate::request::{Request, RequestError};
+use crate::response::{Response, StatusCode};
 
-mod route;
-mod query_params;
+pub mod route;
+pub mod query_params;
 pub mod request;
 pub mod response;
 
@@ -42,7 +41,7 @@ impl FromStr for Method {
             "PUT" => Ok(Self::PUT),
             "PATCH" => Ok(Self::PATCH),
             "OPTIONS" => Ok(Self::OPTIONS),
-            _ => Err(InvalidMethod(value.to_string()))
+            _ => Err(MethodParseError::InvalidMethod(value.to_string()))
         }
     }
 }

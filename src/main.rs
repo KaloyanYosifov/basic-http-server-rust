@@ -1,7 +1,6 @@
+use server;
 use std::env;
 use regex::Regex;
-
-mod server;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

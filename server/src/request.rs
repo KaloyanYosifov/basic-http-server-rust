@@ -4,10 +4,10 @@ use std::fmt::{Display, Formatter};
 use std::str::{Utf8Error};
 
 use super::Method;
-use crate::server::request::RequestError::{FailedToParse, InvalidMethod, InvalidProtocol};
-use crate::server::MethodParseError;
+use crate::route::{RouteError, Route};
+use crate::MethodParseError;
+use crate::request::RequestError::{InvalidMethod, FailedToParse, InvalidProtocol};
 use regex::Regex;
-use crate::server::route::{Route, RouteError};
 
 #[derive(Debug)]
 pub enum RequestError {
@@ -101,9 +101,7 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
 #[cfg(test)]
 mod tests {
     use std::convert::TryInto;
-    use crate::server::Method::{GET, POST};
-
-    use crate::server::request::{Request, RequestError};
+    use crate::request::{Request, RequestError};
 
     #[test]
     fn it_can_create_a_request_from_buffer() {

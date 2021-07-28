@@ -59,7 +59,7 @@ impl<'buf> QueryParams<'buf> {
 
 #[cfg(test)]
 mod tests {
-    use crate::server::query_params::QueryParams;
+    use crate::query_params::QueryParams;
 
     #[test]
     fn it_can_parse_query_params_from_path() {
