@@ -6,6 +6,7 @@ use std::convert::TryInto;
 use crate::request::{Request, RequestError};
 use crate::response::{Response, StatusCode};
 use crate::request_handler::RequestHandler;
+use std::panic::resume_unwind;
 
 pub mod route;
 pub mod query_params;
@@ -71,16 +72,8 @@ impl Server {
             let request_resolver: Result<Request, RequestError> = input[..].try_into();
 
             match request_resolver {
-                Ok(request) => {
-                    println!("{:?}", request);
-
-                    Response::new(
-                        StatusCode::OK,
-                        "<html><body><h3>Hello World</h3></body></html>",
-                    )
-                        .send(&mut stream);
-                }
-                _ => panic!("Something went wrong! {:?}", std::str::from_utf8(&input).unwrap())
+                Ok(request) => handler.handle(&request).send(&mut stream),
+                Err(error) => handler.handle_error(&error).send(&mut stream),
             }
         }
 
