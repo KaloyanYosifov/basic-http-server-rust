@@ -14,3 +14,4 @@ members = [
 [dependencies]
 regex = "1"
 http = { "path" = "./http" }
+core = { "path" = "./core" }

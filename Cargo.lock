@@ -29,6 +29,7 @@ dependencies = [
 name = "initial-learning"
 version = "0.1.0"
 dependencies = [
+ "core",
  "http",
  "regex",
 ]

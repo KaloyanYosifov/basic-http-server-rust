@@ -7,7 +7,7 @@ fn main() {
     let ip_address = extract_ip_address_argument(&args);
     let listener = http::Server::bind(ip_address);
 
-    listener.listen();
+    listener.listen(core::controller::RequestController).unwrap();
 }
 
 fn extract_ip_address_argument(args: &Vec<String>) -> String {

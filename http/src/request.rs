@@ -67,6 +67,20 @@ impl<'buf> Request<'buf> {
     }
 }
 
+impl<'buf> Request<'buf> {
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
+
+    pub fn protocol(&self) -> &str {
+        self.protocol
+    }
+
+    pub fn route(&self) -> &Route {
+        &self.route
+    }
+}
+
 impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
     type Error = RequestError;
 
