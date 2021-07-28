@@ -5,11 +5,13 @@ use std::str::FromStr;
 use std::convert::TryInto;
 use crate::request::{Request, RequestError};
 use crate::response::{Response, StatusCode};
+use crate::request_handler::RequestHandler;
 
 pub mod route;
 pub mod query_params;
 pub mod request;
 pub mod response;
+pub mod request_handler;
 
 #[derive(Debug)]
 pub enum MethodParseError {
@@ -57,7 +59,7 @@ impl Server {
         }
     }
 
-    pub fn listen(&self) -> std::io::Result<()> {
+    pub fn listen(&self, handler: impl RequestHandler) -> std::io::Result<()> {
         let listener = TcpListener::bind(&self.address)?;
 
         for stream in listener.incoming() {
@@ -72,13 +74,11 @@ impl Server {
                 Ok(request) => {
                     println!("{:?}", request);
 
-                    let response = Response::new(
+                    Response::new(
                         StatusCode::OK,
                         "<html><body><h3>Hello World</h3></body></html>",
-                    );
-
-                    stream.write(&response.as_bytes())?;
-                    stream.flush()?;
+                    )
+                        .send(&mut stream);
                 }
                 _ => panic!("Something went wrong! {:?}", std::str::from_utf8(&input).unwrap())
             }

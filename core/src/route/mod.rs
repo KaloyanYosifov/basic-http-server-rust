@@ -1,5 +1,7 @@
 use http::Method;
 use crate::controller::Controller;
+use http::request::Request;
+use http::response::Response;
 
 pub struct Route<'a> {
     method: Method,
@@ -16,7 +18,11 @@ impl<'a> Route<'a> {
 }
 
 impl<'a> Route<'a> {
-    pub fn get_method(&self) -> &Method {
+    pub fn method(&self) -> &Method {
         &self.method
+    }
+
+    pub fn handle(&self, request: &Request) -> Response {
+        self.controller.handle(&request)
     }
 }

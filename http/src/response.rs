@@ -1,3 +1,5 @@
+use std::io::Write;
+
 #[derive(Debug, Copy, Clone)]
 pub enum StatusCode {
     OK = 200,
@@ -42,20 +44,16 @@ impl<'content> Response<'content> {
         &self.content
     }
 
-    pub fn stringify(&self) -> String {
-        let response = format!(
+    pub fn send(&self, writer: &mut impl Write) {
+        write!(
+            writer,
             "HTTP/1.1 {status} {status_message}\r\nContent-Length: {content_length}\r\n\r\n{content}",
             status = self.status as i32,
             status_message = self.status.name(),
             content_length = self.content.len(),
             content = self.content
         );
-
-        response
-    }
-
-    pub fn as_bytes(&self) -> Vec<u8> {
-        self.stringify().into_bytes()
+        writer.flush();
     }
 }
 
