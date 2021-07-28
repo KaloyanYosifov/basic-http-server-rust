@@ -12,6 +12,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "core"
+version = "0.1.0"
+dependencies = [
+ "http",
+]
+
+[[package]]
 name = "http"
 version = "0.1.0"
 dependencies = [

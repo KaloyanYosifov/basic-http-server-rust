@@ -1,16 +1,9 @@
 [package]
-name = "initial-learning"
+name = "core"
 version = "0.1.0"
 edition = "2018"
-
-[workspace]
-members = [
-    "core",
-    "http"
-]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-regex = "1"
-http = { "path" = "./http" }
+http = { path = "../http" }
