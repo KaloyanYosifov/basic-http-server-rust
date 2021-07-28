@@ -78,7 +78,7 @@ impl Server {
                         "<html><body><h3>Hello World</h3></body></html>",
                     );
 
-                    stream.write(response.stringify().as_bytes())?;
+                    stream.write(&response.as_bytes())?;
                     stream.flush()?;
                 }
                 _ => panic!("Something went wrong! {:?}", std::str::from_utf8(&input).unwrap())

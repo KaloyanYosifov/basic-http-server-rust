@@ -53,4 +53,29 @@ impl<'content> Response<'content> {
 
         response
     }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        self.stringify().into_bytes()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::server::response::{Response, StatusCode};
+
+    #[test]
+    fn it_returns_a_stringified_response() {
+        let content = "<html><body></body></html>";
+        let response = Response::new(StatusCode::OK, content);
+        let response_stringified = response.stringify();
+        let expected_response = format!(
+            "HTTP/1.1 {status} {status_message}\r\nContent-Length: {content_length}\r\n\r\n{content}",
+            status = 200,
+            status_message = "OK",
+            content_length = content.len(),
+            content = content
+        );
+
+        assert_eq!(expected_response, response_stringified);
+    }
 }
