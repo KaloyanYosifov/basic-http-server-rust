@@ -5,10 +5,12 @@ use crate::server::MethodParseError::InvalidMethod;
 use std::str::FromStr;
 use crate::server::request::{Request, RequestError};
 use std::convert::TryInto;
+use crate::server::response::{Response, StatusCode};
 
 mod route;
 mod query_params;
-mod request;
+pub mod request;
+pub mod response;
 
 #[derive(Debug)]
 pub enum MethodParseError {
@@ -71,14 +73,12 @@ impl Server {
                 Ok(request) => {
                     println!("{:?}", request);
 
-                    let contents = "<html><body><h3>Hello World</h3></body></html>";
-                    let response = format!(
-                        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
-                        contents.len(),
-                        contents
+                    let response = Response::new(
+                        StatusCode::OK,
+                        "<html><body><h3>Hello World</h3></body></html>",
                     );
 
-                    stream.write(response.as_bytes())?;
+                    stream.write(response.stringify().as_bytes())?;
                     stream.flush()?;
                 }
                 _ => panic!("Something went wrong! {:?}", std::str::from_utf8(&input).unwrap())
