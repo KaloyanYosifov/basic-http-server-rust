@@ -40,11 +40,11 @@ impl<'content> Response<'content> {
         &self.status
     }
 
-    pub fn get_content(&self) -> &str {
+    pub fn content(&self) -> &str {
         &self.content
     }
 
-    pub fn send(&self, writer: &mut impl Write) {
+    pub fn send(&self, writer: &mut impl Write) -> std::io::Result<()> {
         write!(
             writer,
             "HTTP/1.1 {status} {status_message}\r\nContent-Length: {content_length}\r\n\r\n{content}",
@@ -53,7 +53,9 @@ impl<'content> Response<'content> {
             content_length = self.content.len(),
             content = self.content
         );
-        writer.flush();
+        writer.flush()?;
+
+        Ok(())
     }
 }
 

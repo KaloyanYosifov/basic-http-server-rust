@@ -72,8 +72,8 @@ impl Server {
             let request_resolver: Result<Request, RequestError> = input[..].try_into();
 
             match request_resolver {
-                Ok(request) => handler.handle(&request).send(&mut stream),
-                Err(error) => handler.handle_error(&error).send(&mut stream),
+                Ok(request) => handler.handle(&request).send(&mut stream)?,
+                Err(error) => handler.handle_error(&error).send(&mut stream)?,
             }
         }
 
