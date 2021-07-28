@@ -1,11 +1,11 @@
-use server;
+use http;
 use std::env;
 use regex::Regex;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let ip_address = extract_ip_address_argument(&args);
-    let listener = server::Server::bind(ip_address);
+    let listener = http::Server::bind(ip_address);
 
     listener.listen();
 }
