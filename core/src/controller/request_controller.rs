@@ -2,24 +2,28 @@ use http::request_handler::RequestHandler;
 use http::request::Request;
 use http::response::{Response, StatusCode};
 use std::path::PathBuf;
+use crate::route::Route;
+use crate::controller::RouteController;
 
-pub struct RequestController {
+pub struct RequestController<'rc> {
     path: PathBuf,
+    route_controller: &'rc RouteController,
 }
 
-impl RequestController {
-    pub fn new(path: String) -> Self {
+impl<'rc> RequestController<'rc> {
+    pub fn new(path: String, route_controller: &'rc RouteController) -> Self {
         let canonicalized_path = std::fs::canonicalize(&path).unwrap();
 
         println!("Public path is: {}", canonicalized_path.to_str().unwrap());
 
         Self {
-            path: canonicalized_path
+            route_controller,
+            path: canonicalized_path,
         }
     }
 }
 
-impl RequestController {
+impl<'rc> RequestController<'rc> {
     fn file_to_response(&self, path: &str) -> Response {
         let real_path = match std::fs::canonicalize(
             format!("{}{}", self.path.to_str().unwrap(), path)
@@ -42,12 +46,17 @@ impl RequestController {
     }
 }
 
-impl RequestHandler for RequestController {
+impl<'rc> RequestHandler for RequestController<'rc> {
     fn handle(&self, request: &Request) -> Response {
-        match request.route().get_path() {
-            "/" => self.file_to_response("/index.html"),
-            "/welcome" => Response::new(StatusCode::OK, "<html><h1>Hello Welcome</h1></html>".to_string()),
-            path => self.file_to_response(path)
+        let index = self.route_controller
+            .routes()
+            .iter()
+            .position(|route| route.path() == request.route().get_path());
+
+        if index.is_some() {
+            self.route_controller.routes().get(index.unwrap()).unwrap().handle(&request)
+        } else {
+            Response::new(StatusCode::NotFound, "".to_string())
         }
     }
 }

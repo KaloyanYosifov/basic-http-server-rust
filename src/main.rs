@@ -7,12 +7,14 @@ use config::Config;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut settings = load_settings(&args);
+    let mut route_controller = core::controller::RouteController::new();
+
 
     if let Ok(ip_address) = settings.get_str("ip_address") {
         let listener = http::Server::bind(ip_address);
 
         listener.listen(
-            core::controller::RequestController::new(settings.get_str("public_path").unwrap())
+            core::controller::RequestController::new(settings.get_str("public_path").unwrap(), &route_controller)
         ).unwrap();
     } else {
         panic!("Please pass ip address directly or through config file!");
