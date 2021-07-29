@@ -22,11 +22,11 @@ impl RequestController {
             .unwrap();
 
         if !real_path.starts_with(&self.path) {
-            println!("{}", real_path);
-            return Response::new(StatusCode::NotFound, "".as_string());
+            println!("{}", real_path.to_str().unwrap());
+            return Response::new(StatusCode::NotFound, "".to_string());
         }
 
-        println!("Alles gut: {}", real_path);
+        println!("{}", real_path.to_str().unwrap());
         match std::fs::read_to_string(std::path::Path::new(real_path.as_path())) {
             Ok(contents) => Response::new(StatusCode::OK, contents),
             Err(_) => Response::new(StatusCode::NotFound, "".to_string()),

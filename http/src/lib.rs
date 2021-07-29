@@ -63,6 +63,8 @@ impl Server {
     pub fn listen(&self, handler: impl RequestHandler) -> std::io::Result<()> {
         let listener = TcpListener::bind(&self.address)?;
 
+        println!("Listening on: {}", self.address);
+
         for stream in listener.incoming() {
             let mut input = [0; 4096];
             let mut stream = stream?;

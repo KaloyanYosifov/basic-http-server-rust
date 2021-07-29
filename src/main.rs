@@ -1,20 +1,27 @@
 use http;
 use std::env;
 use regex::Regex;
+use std::collections::HashMap;
+use config::Config;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let ip_address = extract_ip_address_argument(&args);
-    let listener = http::Server::bind(ip_address);
+    let mut settings = load_settings(&args);
 
-    listener.listen(
-        core::controller::RequestController::new("./public".to_string())
-    ).unwrap();
+    if let Ok(ip_address) = settings.get_str("ip_address") {
+        let listener = http::Server::bind(ip_address);
+
+        listener.listen(
+            core::controller::RequestController::new("./public".to_string())
+        ).unwrap();
+    } else {
+        panic!("Please pass ip address directly or through config file!");
+    }
 }
 
-fn extract_ip_address_argument(args: &Vec<String>) -> String {
+fn extract_ip_address_argument(args: &Vec<String>) -> Option<String> {
     if args.len() != 2 {
-        panic!("Please pass only the address with the port! Example 127.0.0.1:80");
+        return None;
     }
 
     let ip_address = args.get(1).unwrap().as_str().to_string();
@@ -23,7 +30,20 @@ fn extract_ip_address_argument(args: &Vec<String>) -> String {
         panic!("Ip address is not valid!");
     }
 
-    ip_address
+    Some(ip_address)
+}
+
+fn load_settings(args: &Vec<String>) -> Config {
+    let mut settings = config::Config::new();
+
+    settings
+        .merge(config::File::with_name("config.json").required(false)).unwrap();
+
+    if let Some(ip_address) = extract_ip_address_argument(&args) {
+        settings.set("ip_address", ip_address).unwrap();
+    }
+
+    settings
 }
 
 fn validate_ip_address(ip_address: &str) -> bool {
