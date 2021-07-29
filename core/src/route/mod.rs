@@ -4,13 +4,15 @@ use http::request::Request;
 use http::response::Response;
 
 pub struct Route {
+    path: String,
     method: Method,
     controller: Box<dyn Controller>,
 }
 
 impl Route {
-    pub fn new(method: Method, controller: Box<dyn Controller>) -> Self {
+    pub fn new(path: String, method: Method, controller: Box<dyn Controller>) -> Self {
         Self {
+            path,
             method,
             controller,
         }
@@ -18,6 +20,10 @@ impl Route {
 }
 
 impl Route {
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+
     pub fn method(&self) -> &Method {
         &self.method
     }
@@ -36,17 +42,13 @@ mod tests {
     use http::route::Route as HttpRoute;
     use http::Method;
 
-    struct BasicController;
-
-    impl Controller for BasicController {
-        fn handle(&self, _: &Request) -> Response {
-            Response::new(StatusCode::NotFound, "".to_string())
-        }
-    }
-
     #[test]
     fn it_can_create_a_route() {
-        let route = Route::new(Method::GET, Box::new(BasicController));
+        let route = Route::new(
+            "/".to_string(),
+            Method::GET,
+            Box::new(crate::controller::FakeController::new()),
+        );
         let request = Request::new(
             Method::GET,
             "HTTP/1.1",
