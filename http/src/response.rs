@@ -36,7 +36,7 @@ impl Response {
 }
 
 impl Response {
-    pub fn get_status_code(&self) -> &StatusCode {
+    pub fn status(&self) -> &StatusCode {
         &self.status
     }
 
