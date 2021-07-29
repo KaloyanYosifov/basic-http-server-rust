@@ -21,13 +21,13 @@ impl StatusCode {
 }
 
 #[derive(Debug)]
-pub struct Response<'content> {
+pub struct Response {
     status: StatusCode,
-    content: &'content str,
+    content: String,
 }
 
-impl<'content> Response<'content> {
-    pub fn new(status: StatusCode, content: &'content str) -> Self {
+impl Response {
+    pub fn new(status: StatusCode, content: String) -> Self {
         Self {
             status,
             content,
@@ -35,7 +35,7 @@ impl<'content> Response<'content> {
     }
 }
 
-impl<'content> Response<'content> {
+impl Response {
     pub fn get_status_code(&self) -> &StatusCode {
         &self.status
     }
@@ -56,26 +56,5 @@ impl<'content> Response<'content> {
         writer.flush()?;
 
         Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::response::{Response, StatusCode};
-
-    #[test]
-    fn it_returns_a_stringified_response() {
-        let content = "<html><body></body></html>";
-        let response = Response::new(StatusCode::OK, content);
-        let response_stringified = response.stringify();
-        let expected_response = format!(
-            "HTTP/1.1 {status} {status_message}\r\nContent-Length: {content_length}\r\n\r\n{content}",
-            status = 200,
-            status_message = "OK",
-            content_length = content.len(),
-            content = content
-        );
-
-        assert_eq!(expected_response, response_stringified);
     }
 }
