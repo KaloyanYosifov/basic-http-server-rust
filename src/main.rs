@@ -12,7 +12,7 @@ fn main() {
         let listener = http::Server::bind(ip_address);
 
         listener.listen(
-            core::controller::RequestController::new("./public".to_string())
+            core::controller::RequestController::new(settings.get_str("public_path").unwrap())
         ).unwrap();
     } else {
         panic!("Please pass ip address directly or through config file!");
@@ -41,6 +41,10 @@ fn load_settings(args: &Vec<String>) -> Config {
 
     if let Some(ip_address) = extract_ip_address_argument(&args) {
         settings.set("ip_address", ip_address).unwrap();
+    }
+
+    if let Err(_) = settings.get_str("public_path") {
+        settings.set("public_path", "./public");
     }
 
     settings

@@ -1,28 +1,36 @@
 use http::request_handler::RequestHandler;
 use http::request::Request;
 use http::response::{Response, StatusCode};
+use std::path::PathBuf;
 
 pub struct RequestController {
-    path: String,
+    path: PathBuf,
 }
 
 impl RequestController {
     pub fn new(path: String) -> Self {
+        let canonicalized_path = std::fs::canonicalize(&path).unwrap();
+
+        println!("Public path is: {}", canonicalized_path.to_str().unwrap());
+
         Self {
-            path
+            path: canonicalized_path
         }
     }
 }
 
 impl RequestController {
     fn file_to_response(&self, path: &str) -> Response {
-        let real_path = std::fs::canonicalize(
-            format!("{}/{}", self.path, path)
-        )
-            .unwrap();
+        let real_path = match std::fs::canonicalize(
+            format!("{}{}", self.path.to_str().unwrap(), path)
+        ) {
+            Ok(path) => path,
+            Err(_) => return Response::new(StatusCode::NotFound, "".to_string()),
+        };
 
         if !real_path.starts_with(&self.path) {
-            println!("{}", real_path.to_str().unwrap());
+            println!("Malicious: {}", real_path.to_str().unwrap());
+
             return Response::new(StatusCode::NotFound, "".to_string());
         }
 
