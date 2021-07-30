@@ -1,6 +1,6 @@
 use http::request::Request;
 use http::response::{Response, StatusCode};
-use crate::controller::Controller;
+use crate::controller::{Controller, RequestController};
 
 type HandleFunction = fn(request: &Request) -> Response;
 
@@ -23,7 +23,7 @@ impl FakeController {
 }
 
 impl Controller for FakeController {
-    fn handle(&self, request: &Request) -> Response {
+    fn handle(&self, request: &Request, _: &RequestController) -> Response {
         if let Some(handle) = self.handle {
             handle(&request)
         } else {

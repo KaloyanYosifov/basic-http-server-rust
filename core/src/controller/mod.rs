@@ -9,5 +9,5 @@ mod route_controller;
 mod request_controller;
 
 pub trait Controller {
-    fn handle(&self, request: &Request) -> Response;
+    fn handle(&self, request: &Request, request_controller: &RequestController) -> Response;
 }

@@ -24,7 +24,7 @@ impl<'rc> RequestController<'rc> {
 }
 
 impl<'rc> RequestController<'rc> {
-    fn file_to_response(&self, path: &str) -> Response {
+    pub fn file_to_response(&self, path: &str) -> Response {
         let real_path = match std::fs::canonicalize(
             format!("{}{}", self.path.to_str().unwrap(), path)
         ) {
@@ -51,12 +51,12 @@ impl<'rc> RequestHandler for RequestController<'rc> {
         let index = self.route_controller
             .routes()
             .iter()
-            .position(|route| route.path() == request.route().get_path());
+            .position(|route| route.path() == request.route().path());
 
         if index.is_some() {
-            self.route_controller.routes().get(index.unwrap()).unwrap().handle(&request)
+            self.route_controller.routes().get(index.unwrap()).unwrap().handle(&request, &self)
         } else {
-            Response::new(StatusCode::NotFound, "".to_string())
+            self.file_to_response(request.route().path())
         }
     }
 }

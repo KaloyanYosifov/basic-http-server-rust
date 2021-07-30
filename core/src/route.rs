@@ -1,5 +1,5 @@
 use http::Method;
-use crate::controller::Controller;
+use crate::controller::{Controller, RequestController};
 use http::request::Request;
 use http::response::Response;
 
@@ -28,8 +28,8 @@ impl Route {
         &self.method
     }
 
-    pub fn handle(&self, request: &Request) -> Response {
-        self.controller.handle(&request)
+    pub fn handle(&self, request: &Request, request_controller: &RequestController) -> Response {
+        self.controller.handle(&request, &request_controller)
     }
 }
 

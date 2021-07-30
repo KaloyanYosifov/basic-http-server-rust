@@ -36,11 +36,11 @@ impl<'buf> Route<'buf> {
 }
 
 impl<'buf> Route<'buf> {
-    pub fn get_path(&self) -> &str {
+    pub fn path(&self) -> &str {
         &self.path
     }
 
-    pub fn get_param(&self, key: &str) -> Option<&&str> {
+    pub fn param(&self, key: &str) -> Option<&&str> {
         self.query_params.get_param(key)
     }
 }
@@ -60,8 +60,8 @@ mod tests {
     fn it_has_query_params() {
         let route = Route::new("/?hello=test&working=true").unwrap();
 
-        assert_eq!("test", *route.get_param("hello").unwrap());
-        assert_eq!("true", *route.get_param("working").unwrap());
+        assert_eq!("test", *route.param("hello").unwrap());
+        assert_eq!("true", *route.param("working").unwrap());
     }
 
     #[test]

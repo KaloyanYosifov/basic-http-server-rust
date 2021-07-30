@@ -122,7 +122,7 @@ mod tests {
         let buffer = "GET / HTTP/1.1\n".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
-        assert_eq!("/", request.route.get_path());
+        assert_eq!("/", request.route.path());
         assert_eq!("HTTP/1.1", request.protocol);
         assert!(matches!(request.method, GET));
     }
@@ -132,7 +132,7 @@ mod tests {
         let buffer = "POST / HTTP/1.1\nsomeHeader".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
-        assert_eq!("/", request.route.get_path());
+        assert_eq!("/", request.route.path());
         assert_eq!("HTTP/1.1", request.protocol);
         assert!(matches!(request.method, POST));
     }
@@ -142,7 +142,7 @@ mod tests {
         let buffer = "POST / HTTP/2.0\nsomeHeader".as_bytes();
         let request: Request = buffer.try_into().unwrap();
 
-        assert_eq!("/", request.route.get_path());
+        assert_eq!("/", request.route.path());
         assert_eq!("HTTP/2.0", request.protocol);
         assert!(matches!(request.method, POST));
     }

@@ -3,12 +3,23 @@ use std::env;
 use regex::Regex;
 use std::collections::HashMap;
 use config::Config;
+use core::route::Route;
+use http::Method::GET;
+use crate::controllers::HomeController;
+
+mod controllers;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut settings = load_settings(&args);
     let mut route_controller = core::controller::RouteController::new();
-
+    route_controller.add(
+        Route::new(
+            "/".to_string(),
+            GET,
+            Box::new(HomeController),
+        )
+    );
 
     if let Ok(ip_address) = settings.get_str("ip_address") {
         let listener = http::Server::bind(ip_address);
