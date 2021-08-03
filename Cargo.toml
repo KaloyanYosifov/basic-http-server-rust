@@ -16,3 +16,4 @@ regex = "1"
 config = "0.11"
 http = { "path" = "./http" }
 core = { "path" = "./core" }
+core_macros = { "path" = "./core_macros" }

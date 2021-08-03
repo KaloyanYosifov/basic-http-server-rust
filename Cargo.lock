@@ -59,6 +59,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "core_macros"
+version = "0.1.0"
+
+[[package]]
 name = "http"
 version = "0.1.0"
 dependencies = [
@@ -71,6 +75,7 @@ version = "0.1.0"
 dependencies = [
  "config",
  "core",
+ "core_macros",
  "http",
  "regex",
 ]
